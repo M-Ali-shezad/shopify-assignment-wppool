@@ -3595,3 +3595,25 @@ details-disclosure > details {
     transform: translateX(100%) scaleX(0);
   }
 }
+
+/* CUSTOM CSS */
+
+.product-configurator {
+  padding: 20px;
+  border: 1px solid #ddd;
+}
+
+.step-panel {
+  display: none;
+}
+
+.step-panel.active {
+  display: block;
+}
+
+.step-btn.active {
+  font-weight: bold;
+}
+#add-to-cart-btn{
+  cursor: pointer;
+}

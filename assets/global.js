@@ -1330,3 +1330,230 @@ class CartPerformance {
     );
   }
 }
+
+// Custom js for custom product with multiple variants
+document.addEventListener("DOMContentLoaded", function () {
+
+  // ================= STEP SWITCH =================
+  document.querySelectorAll(".step-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const step = btn.dataset.step;
+
+      document.querySelectorAll(".step-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".step-panel").forEach(p => p.classList.remove("active"));
+
+      btn.classList.add("active");
+      document.querySelector(`.step-panel[data-step="${step}"]`).classList.add("active");
+    });
+  });
+
+  // ================= CONDITIONAL =================
+  const brandSelect = document.getElementById("vent-brand");
+  const broanOptions = document.getElementById("broan-options");
+
+  if (brandSelect) {
+    brandSelect.addEventListener("change", function () {
+      broanOptions.style.display = this.value === "broan" ? "block" : "none";
+    });
+  }
+
+  // ================= PRICE =================
+  const priceEl = document.getElementById("total-price");
+
+  if (priceEl) {
+    const basePrice = parseInt(priceEl.dataset.basePrice) / 100;
+
+    function getValue(name) {
+      const el = document.querySelector(`[name="${name}"]`);
+      return el ? parseInt(el.value || 0) : 0;
+    }
+
+    function calculatePrice() {
+      let total = basePrice;
+
+      total += getValue("color_match");
+      total += getValue("size");
+
+      total += getValue("vent_option");
+      total += getValue("broan_cfm");
+      total += getValue("non_duct");
+      total += getValue("recirculating");
+
+      total += getValue("trim_option");
+      total += getValue("trim_style");
+      total += getValue("molding");
+
+      total += getValue("depth");
+      total += getValue("height");
+      total += getValue("chimney");
+      total += getValue("solid_bottom");
+
+      total += getValue("rush");
+
+      priceEl.innerText = "Rs." + total.toFixed(2);
+    }
+
+    document.querySelectorAll("select").forEach(select => {
+      select.addEventListener("change", calculatePrice);
+    });
+  }
+
+  // ================= ADD TO CART =================
+  const btn = document.getElementById("add-to-cart-btn");
+  const form = document.getElementById("custom-add-to-cart-form");
+
+  if (!btn || !form) return;
+
+  btn.addEventListener("click", function () {
+
+    // 👉 Properties
+    function getText(name) {
+        return document.querySelector(`[name="${name}"]`)?.selectedOptions[0]?.text || '';
+      }
+
+      function getValue(name) {
+        return document.querySelector(`[name="${name}"]`)?.value || '';
+      }
+
+      // ===== STEP 1 =====
+      document.getElementById("prop-color-option").value = getText("color_option");
+      document.getElementById("prop-color").value = getText("color");
+      document.getElementById("prop-color-match").value = getText("color_match");
+      document.getElementById("prop-color-code").value = getValue("color_code");
+      document.getElementById("prop-size").value = getText("size");
+
+      // ===== STEP 2 =====
+      document.getElementById("prop-vent-option").value = getText("vent_option");
+      document.getElementById("prop-brand").value = getValue("vent_brand");
+      document.getElementById("prop-cfm").value = getText("broan_cfm");
+      document.getElementById("prop-non-duct").value = getText("non_duct");
+      document.getElementById("prop-recirculating").value = getText("recirculating");
+
+      // ===== STEP 3 =====
+      document.getElementById("prop-trim-option").value = getText("trim_option");
+      document.getElementById("prop-trim-style").value = getText("trim_style");
+      document.getElementById("prop-molding").value = getText("molding");
+
+      // ===== STEP 4 =====
+      document.getElementById("prop-depth").value = getText("depth");
+      document.getElementById("prop-height").value = getText("height");
+      document.getElementById("prop-chimney").value = getText("chimney");
+      document.getElementById("prop-solid-bottom").value = getText("solid_bottom");
+
+      // ===== STEP 5 =====
+      document.getElementById("prop-rush").value = getText("rush");
+
+    const formData = new FormData(form);
+
+    fetch('/cart/add.js', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Add to cart failed');
+      return res.json();
+    })
+
+    // 🔥 IMPORTANT: Fetch BOTH drawer + header
+    .then(() => fetch('/cart?sections=cart-drawer,header', {
+      cache: "no-store"
+    }))
+
+    .then(res => res.json())
+    .then(data => {
+
+      const parser = new DOMParser();
+
+      // ================= DRAWER UPDATE =================
+      const drawerDoc = parser.parseFromString(data['cart-drawer'], 'text/html');
+      const newDrawer = drawerDoc.querySelector('cart-drawer');
+      const currentDrawer = document.querySelector('cart-drawer');
+
+      if (newDrawer && currentDrawer) {
+        currentDrawer.innerHTML = newDrawer.innerHTML;
+        currentDrawer.classList.remove('is-empty');
+        currentDrawer.classList.add('active');
+        document.body.classList.add('overflow-hidden');
+      }
+
+      // ================= HEADER UPDATE (CART ICON 🔥) =================
+      const headerDoc = parser.parseFromString(data['header'], 'text/html');
+      const newHeader = headerDoc.querySelector('#cart-icon-bubble');
+      const currentHeader = document.querySelector('#cart-icon-bubble');
+
+      if (newHeader && currentHeader) {
+        currentHeader.innerHTML = newHeader.innerHTML;
+      }
+
+    })
+    .catch(err => console.error("Error:", err));
+
+  });
+
+});
+// ENd 
+
+// custom announcement-bar
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  const bar = document.querySelector(".cs-announcement-bar");
+  if (!bar) return;
+
+  const messages = bar.querySelectorAll(".cs-announcement-bar .announcement-message");
+  const speed = (bar.dataset.speed || 4) * 1000;
+
+  let current = 0;
+
+  // 🔥 Load dismissed from session
+  let dismissed = JSON.parse(sessionStorage.getItem("dismissedMessages")) || [];
+
+  function showMessage(index) {
+    messages.forEach((msg, i) => {
+
+      if (dismissed.includes(i)) {
+        msg.style.display = "none";
+      } else {
+        msg.style.display = i === index ? "flex" : "none";
+      }
+
+    });
+  }
+
+  function getNextIndex() {
+    let next = current;
+    let tries = 0;
+
+    do {
+      next = (next + 1) % messages.length;
+      tries++;
+    } while (dismissed.includes(next) && tries < messages.length);
+
+    return next;
+  }
+
+  showMessage(current);
+
+  setInterval(() => {
+    current = getNextIndex();
+    showMessage(current);
+  }, speed);
+
+  // 🔥 Dismiss logic
+  bar.querySelectorAll(".cs-announcement-bar .dismiss-btn").forEach((btn, index) => {
+    btn.addEventListener("click", function () {
+
+      dismissed.push(index);
+      sessionStorage.setItem("dismissedMessages", JSON.stringify(dismissed));
+
+      messages[index].style.display = "none";
+
+      // Check if all dismissed
+      if (dismissed.length === messages.length) {
+        bar.style.display = "none";
+      }
+
+    });
+  });
+
+});
