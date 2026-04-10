@@ -1,0 +1,74 @@
+<div class="cs-announcement-bar" data-speed="{{ section.settings.rotation_speed }}">
+  
+  {% for block in section.blocks %}
+    <div class="announcement-message" data-index="{{ forloop.index0 }}">
+      <p>{{ block.settings.text }}</p>
+      <button class="dismiss-btn">✕</button>
+    </div>
+  {% endfor %}
+
+</div>
+<style>
+    .cs-announcement-bar {
+  background: black;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  position: relative;
+}
+
+.cs-announcement-bar .announcement-message {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.cs-announcement-bar .announcement-message p{
+ text-align: center;
+ padding: 0;
+ margin: 0;
+ width: 100%
+}
+
+.cs-announcement-bar .dismiss-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+    </style>
+{% schema %}
+{
+  "name": "Custom Announcement Bar",
+  "settings": [
+    {
+      "type": "range",
+      "id": "rotation_speed",
+      "label": "Rotation Speed (seconds)",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Message Text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Announcement Bar"
+    }
+  ]
+}
+{% endschema %}
