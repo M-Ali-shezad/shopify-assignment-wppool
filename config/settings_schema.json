@@ -8,6 +8,40 @@
     "theme_support_url": "https://support.shopify.com/"
   },
   {
+  "name": "Live Chat",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_tawk",
+      "label": "Enable Tawk Chat",
+      "default": true
+    }
+  ]
+},
+{
+  "name": "Shipping Settings",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_quick_ship",
+      "label": "Enable Quick Ship",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "quick_ship",
+      "label": "Quick Ship Time",
+      "default": "3-5 Days"
+    },
+    {
+      "type": "text",
+      "id": "standard_ship",
+      "label": "Standard Ship Time",
+      "default": "10-15 Days"
+    }
+  ]
+},
+  {
     "name": "t:settings_schema.logo.name",
     "settings": [
       {
