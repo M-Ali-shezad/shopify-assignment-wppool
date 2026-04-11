@@ -8,6 +8,29 @@
     "theme_support_url": "https://support.shopify.com/"
   },
   {
+  "name": "Analytics",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_tracking",
+      "label": "Enable Analytics & Tracking",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "ga_id",
+      "label": "Google Analytics (GA4) ID",
+      "default": "G-XXXXXXX"
+    },
+    {
+      "type": "text",
+      "id": "fb_pixel_id",
+      "label": "Facebook Pixel ID",
+      "default": "1234567890"
+    }
+  ]
+},
+  {
   "name": "Live Chat",
   "settings": [
     {
